@@ -1,0 +1,49 @@
+length=input("Enter the length")
+ethernet_mtu =input("Enter mtu of ethernet:")
+wan_mtu =input("Enter mtu of wan:")
+
+ethernet_fragments = ip_datagram_header(length, ethernet_mtu)
+wan_fragments = ip_datagram_header(length, wan_mtu)
+
+print("Fragments after crossing Ethernet LAN:")
+for i, fragment in enumerate(ethernet_fragments):
+    print(f"Fragment {i+1}:")
+    for field, value in fragment.items():
+        print(f"{field}: {value}")
+    print()
+
+print("Fragments after crossing WAN:")
+for i, fragment in enumerate(wan_fragments):
+    print(f"Fragment {i+1}:")
+    for field, value in fragment.items():
+        print(f"{field}: {value}")
+    print()
+
+print("Number of fragments after crossing Ethernet LAN:", len(ethernet_fragments))
+print("Number of fragments after crossing WAN:", len(wan_fragments))
+
+
+def ip_datagram_header(length, mtu):
+    fragment_offset = 0
+    more_fragments_bit = 1
+    total_length = length
+
+    fragments = []
+    while total_length > 0:
+        if total_length > mtu:
+            this_fragment_length = mtu
+        else:
+            this_fragment_length = total_length
+            more_fragments_bit = 0
+
+        fragment = {
+            'MORE-FRAGMENTS-BIT': more_fragments_bit,
+            'FRAGMENT OFFSET': fragment_offset,
+            'TOTAL LENGTH': this_fragment_length
+        }
+        fragments.append(fragment)
+
+        fragment_offset += this_fragment_length // 8
+        total_length -= this_fragment_length
+
+    return fragments
