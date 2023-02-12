@@ -1,0 +1,96 @@
+def findClass(ip):
+    if(ip[0] >= '0' and ip[0] <= '127'):
+        return 'A'
+    
+    elif(ip[0] >='128' and ip[0] <= '191'):
+        return 'B'
+    
+    elif(ip[0] >= '192' and ip[0] <= '223'):
+        return 'C'
+    
+    elif(ip[0] >= '224' and ip[0] <= '239'):
+        return 'D'
+    
+    else:
+        return 'E'
+
+def findsubnetbits(ip,ipclass):
+    if (ipclass=="A"):
+        return suffix-8
+    elif (ipclass=="B"):
+        return suffix-16
+    elif (ipclass=="C"):
+        return suffix-24
+    else:
+        return -1
+def findhostbits(subnetbits,ipclass):
+    if (ipclass=="A"):
+        return 32-8-subnetbits
+    elif (ipclass=="B"):
+        return 32-16-subnetbits
+    elif (ipclass=="C"):
+        return 32-24-subnetbits
+    else:
+        return -1
+def findsubnetmask(ip,subnetbits):
+    sub=[]
+    counter=7
+    sum=0
+    if(ip[0] >= '0' and ip[0] <= '127'):
+        sub.append('255')
+        for i in range(subnetbits):
+            sum+=pow(2,counter)
+            counter-=1
+        sub.append(str(sum))
+        x=['0','0']
+        sub.append(x)
+        return sub
+    elif(ip[0] >='128' and ip[0] <= '191'):
+        y=['255','255']
+        sub.extend(y)
+        for i in range(subnetbits):
+            sum+=pow(2,counter)
+            counter-=1
+        sub.append(str(sum))
+        sub.append('0')
+        return sub
+    elif(ip[0] >= '192' and ip[0] <= '223'):
+        z=['255','255','255']
+        sub.extend(z)
+        for i in range(subnetbits):
+            sum+=pow(2,counter)
+            counter-=1
+        sub.append(str(sum))
+        return sub
+    else:
+        return -1
+    
+def findnetworkaddress(ip,subnetmask):
+    net=[]
+    ip1=int(ip[0])
+    ip2=int(ip[1])
+    ip3=int(ip[2])
+    ip4=int(ip[3])
+    subnetmask1=int(subnetmask[0])
+    subnetmask2=int(subnetmask[1])
+    subnetmask3=int(subnetmask[2])
+    subnetmask4=int(subnetmask[3])
+    net.append(ip1 & subnetmask1)
+    net.append(ip2 & subnetmask2)
+    net.append(ip3 & subnetmask3)
+    net.append(ip4 & subnetmask4)
+    return net
+        
+
+ip=input("Enter the ip address with /suffix:").split('/')
+suffix=int(ip[1])
+ip=ip[0]
+ip=ip.split(".")
+ipclass=findClass(ip)
+subnetbits=findsubnetbits(ip, ipclass)
+subnetscreated=pow(2,subnetbits)
+hostbits=findhostbits(subnetbits,ipclass)
+hostspersubnet=pow(2,hostbits)
+
+subnetmask=findsubnetmask(ip,subnetbits)
+networkaddress=findnetworkaddress(ip,subnetmask)
